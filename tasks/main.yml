@@ -1,0 +1,70 @@
+---
+
+- name: install gitlab dependencies
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - curl
+    - openssh-server
+    - openssl
+    - policycoreutils-python
+    - postfix
+    - tzdata
+
+- name: download repository config
+  get_url:
+    url: "https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/config_file.repo?os={{ ansible_distribution | lower }}&dist={{ ansible_distribution_major_version }}"
+    dest: /etc/yum.repos.d/gitlab_gitlab-ce.repo
+
+- name: install gitlab-ce
+  yum:
+    name: gitlab-ce
+    state: present
+  notify: reconfigure gitlab
+
+- name: create gitlab tls directories
+  file:
+    state: directory
+    mode: "{{ item.mode | default(omit) }}"
+    owner: root
+    path: "{{ item.path }}"
+  with_items:
+    - path: /etc/gitlab/trusted-certs
+    - path: /etc/gitlab/ssl
+      mode: go-rwx
+
+- name: create tls symlinks
+  file:
+    state: link
+    src: "{{ item.src }}"
+    path: "{{ item.dst }}"
+    force: yes
+  with_items:
+    - src: "/etc/pki/tls/certs/{{ ansible_fqdn }}.crt"
+      dst: "/etc/gitlab/ssl/{{ ansible_fqdn }}.crt"
+    - src: "/etc/pki/tls/private/{{ ansible_fqdn }}.key"
+      dst: "/etc/gitlab/ssl/{{ ansible_fqdn }}.key"
+    - src: "/etc/ipa/ca.crt"
+      dst: "/etc/gitlab/trusted-certs/ipa-ca.crt"
+  notify: reconfigure gitlab
+
+- name: template configuration file
+  template:
+    src: "{{ ansemjo_gitlab_template }}"
+    dest: /etc/gitlab/gitlab.rb
+    owner: root
+    group: root
+    mode: 0600
+  notify: reconfigure gitlab
+
+- name: open firewall ports
+  firewalld:
+    service: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  with_items:
+    - http
+    - https
+

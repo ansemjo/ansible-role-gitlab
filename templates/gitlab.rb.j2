@@ -1,0 +1,56 @@
+# https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/files/gitlab-config-template/gitlab.rb.template
+
+# integrated nginx and ssl settings
+external_url "{{ gitlab_external_url }}"
+nginx['redirect_http_to_https'] = {{ gitlab_redirect_to_https }}
+nginx['ssl_certificate'] = "{{ gitlab_tls_cert }}"
+nginx['ssl_certificate_key'] = "{{ gitlab_tls_key }}"
+
+{% if gitlab_registry_enabled == "true" %}
+# integrated docker registry settings
+registry_external_url "{{ gitlab_registry_external_url }}"
+registry_nginx['ssl_certificate'] = "{{ gitlab_registry_tls_cert }}"
+registry_nginx['ssl_certificate_key'] = "{{ gitlab_registry_tls_key }}"
+{% endif %}
+
+# default color theme
+gitlab_rails['gitlab_default_theme'] = {{ gitlab_default_theme }}
+
+# default project feature settings
+gitlab_rails['gitlab_default_projects_features_issues'] = {{ gitlab_default_projects_features_issues }}
+gitlab_rails['gitlab_default_projects_features_merge_requests'] = {{ gitlab_default_projects_features_merge_requests }}
+gitlab_rails['gitlab_default_projects_features_wiki'] = {{ gitlab_default_projects_features_wiki }}
+gitlab_rails['gitlab_default_projects_features_snippets'] = {{ gitlab_default_projects_features_snippets }}
+gitlab_rails['gitlab_default_projects_features_builds'] = {{ gitlab_default_projects_features_builds }}
+gitlab_rails['gitlab_default_projects_features_container_registry'] = {{ gitlab_default_projects_features_container_registry }}
+
+# ldap authentication
+gitlab_rails['ldap_enabled'] = {{ gitlab_ldap_enabled }}
+{% if gitlab_ldap_enabled == "true" %}
+gitlab_rails['ldap_servers'] = YAML.load <<-'INLINE'
+  main:
+    label: {{ gitlab_ldap_label }}
+
+    host: {{ gitlab_ldap_host }}
+    port: {{ gitlab_ldap_port }}
+    encryption: {{ gitlab_ldap_encryption }}
+    verify_certificates: {{ gitlab_ldap_verify_certificates }}
+    ca_file: {{ gitlab_ldap_ca_file }}
+
+    uid: {{ gitlab_ldap_uid }}
+    bind_dn: {{ gitlab_ldap_bind_dn }}
+    password: {{ gitlab_ldap_password }}
+
+    active_directory: {{ gitlab_ldap_active_directory }}
+    allow_username_or_email_login: {{ gitlab_ldap_allow_username_or_email }}
+    block_auto_created_users: {{ gitlab_ldap_block_autocreated_users }}
+    base: {{ gitlab_ldap_base }}
+    user_filter: {{ gitlab_ldap_user_filter }}
+    attributes:
+      username: ['uid', 'userid', 'sAMAccountName']
+      email:    ['mail', 'email', 'userPrincipalName']
+      name:       'cn'
+      first_name: 'givenName'
+      last_name:  'sn'
+INLINE
+{% endif %}

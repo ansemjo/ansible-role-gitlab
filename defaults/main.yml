@@ -1,0 +1,44 @@
+---
+
+# role variables
+ansemjo_gitlab_template: "gitlab.rb.j2"
+
+# gitlab nginx
+gitlab_external_url: "https://{{ ansible_fqdn }}/"
+gitlab_tls_cert: "/etc/gitlab/ssl/{{ ansible_fqdn }}.crt"
+gitlab_tls_key: "/etc/gitlab/ssl/{{ ansible_fqdn }}.key"
+gitlab_redirect_to_https: "true"
+
+# gitlab container registry
+gitlab_registry_enabled: "false"
+gitlab_registry_external_url: "https://{{ ansible_fqdn }}:445/"
+gitlab_registry_tls_cert: "/etc/gitlab/ssl/{{ ansible_fqdn }}.crt"
+gitlab_registry_tls_key: "/etc/gitlab/ssl/{{ ansible_fqdn }}.key"
+
+# color theme
+gitlab_default_theme: 4 # blue
+
+# default project feature settings
+gitlab_default_projects_features_issues: "true"
+gitlab_default_projects_features_merge_requests: "true"
+gitlab_default_projects_features_wiki: "false"
+gitlab_default_projects_features_snippets: "false"
+gitlab_default_projects_features_builds: "false"
+gitlab_default_projects_features_container_registry: "false"
+
+# ldap configuration
+gitlab_ldap_enabled: "false"
+gitlab_ldap_label: "LDAP"
+gitlab_ldap_host: "example.com"
+gitlab_ldap_port: "389"
+gitlab_ldap_encryption: "start_tls"
+gitlab_ldap_verify_certificates: "true"
+gitlab_ldap_ca_file: "/etc/gitlab/trusted-certs/ca.crt"
+gitlab_ldap_uid: "uid"
+gitlab_ldap_bind_dn: "uid=gitlab,cn=service,dc=example,dc=com"
+gitlab_ldap_password: "password"
+gitlab_ldap_base: "dc=example,dc=com"
+gitlab_ldap_user_filter: "memberOf=cn=gitlab-users,cn=groups,dc=example,dc=com"
+gitlab_ldap_active_directory: "false"
+gitlab_ldap_allow_username_or_email: "false"
+gitlab_ldap_block_autocreated_users: "false"
