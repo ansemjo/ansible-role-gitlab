@@ -25,6 +25,7 @@
   with_items:
     - https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey
     - https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey/gitlab-gitlab-ce-3D645A26AB9FBD22.pub.gpg
+  when: repo is changed
   register: keys
 
 - name: yum makecache
@@ -75,7 +76,7 @@
     mode: 0600
   notify: reconfigure gitlab
 
-- name: open firewall ports
+- name: open firewall services
   firewalld:
     service: "{{ item }}"
     permanent: yes
@@ -84,4 +85,12 @@
   with_items:
     - http
     - https
+    - ssh
 
+- name: open additional firewall ports
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  with_items: "{{ ansemjo_gitlab_additional_ports }}"

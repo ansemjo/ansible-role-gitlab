@@ -2,18 +2,21 @@
 
 # role variables
 ansemjo_gitlab_template: "gitlab.rb.j2"
+ansemjo_gitlab_additional_ports: []
 
 # gitlab nginx
-gitlab_external_url: "https://{{ ansible_fqdn }}/"
-gitlab_tls_cert: "/etc/gitlab/ssl/{{ ansible_fqdn }}.crt"
-gitlab_tls_key: "/etc/gitlab/ssl/{{ ansible_fqdn }}.key"
+gitlab_fqdn: "{{ ansible_fqdn }}"
+gitlab_external_url: "https://{{ gitlab_fqdn }}/"
+gitlab_tls_cert: "/etc/gitlab/ssl/{{ gitlab_fqdn }}.crt"
+gitlab_tls_key: "/etc/gitlab/ssl/{{ gitlab_fqdn }}.key"
 gitlab_redirect_to_https: "true"
 
 # gitlab container registry
+gitlab_registry_fqdn: "registry.{{ gitlab_fqdn }}"
 gitlab_registry_enabled: "false"
-gitlab_registry_external_url: "https://{{ ansible_fqdn }}:445/"
-gitlab_registry_tls_cert: "/etc/gitlab/ssl/{{ ansible_fqdn }}.crt"
-gitlab_registry_tls_key: "/etc/gitlab/ssl/{{ ansible_fqdn }}.key"
+gitlab_registry_external_url: "https://{{ gitlab_registry_fqdn }}/"
+gitlab_registry_tls_cert: "/etc/gitlab/ssl/{{ gitlab_registry_fqdn }}.crt"
+gitlab_registry_tls_key: "/etc/gitlab/ssl/{{ gitlab_registry_fqdn }}.key"
 
 # color theme
 gitlab_default_theme: 4 # blue
