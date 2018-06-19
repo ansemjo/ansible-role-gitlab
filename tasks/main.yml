@@ -52,19 +52,13 @@
     - path: /etc/gitlab/ssl
       mode: go-rwx
 
-- name: create tls symlinks
+- name: create ca symlinks
   file:
     state: link
     src: "{{ item.src }}"
     path: "{{ item.dst }}"
     force: yes
-  with_items:
-    - src: "/etc/pki/tls/certs/{{ ansible_fqdn }}.crt"
-      dst: "/etc/gitlab/ssl/{{ ansible_fqdn }}.crt"
-    - src: "/etc/pki/tls/private/{{ ansible_fqdn }}.key"
-      dst: "/etc/gitlab/ssl/{{ ansible_fqdn }}.key"
-    - src: "/etc/ipa/ca.crt"
-      dst: "/etc/gitlab/trusted-certs/ca.crt"
+  with_items: "{{ ansemjo_gitlab_ca_symlinks }}"
   notify: reconfigure gitlab
 
 - name: template configuration file
