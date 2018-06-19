@@ -46,7 +46,7 @@
     - src: "/etc/pki/tls/private/{{ ansible_fqdn }}.key"
       dst: "/etc/gitlab/ssl/{{ ansible_fqdn }}.key"
     - src: "/etc/ipa/ca.crt"
-      dst: "/etc/gitlab/trusted-certs/ipa-ca.crt"
+      dst: "/etc/gitlab/trusted-certs/ca.crt"
   notify: reconfigure gitlab
 
 - name: template configuration file

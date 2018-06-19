@@ -28,10 +28,10 @@ gitlab_default_projects_features_container_registry: "false"
 
 # ldap configuration
 gitlab_ldap_enabled: "false"
-gitlab_ldap_label: "LDAP"
+gitlab_ldap_label: "LDAP Authentication"
 gitlab_ldap_host: "example.com"
-gitlab_ldap_port: "389"
-gitlab_ldap_encryption: "start_tls"
+gitlab_ldap_port: "636"
+gitlab_ldap_encryption: "simple_tls"
 gitlab_ldap_verify_certificates: "true"
 gitlab_ldap_ca_file: "/etc/gitlab/trusted-certs/ca.crt"
 gitlab_ldap_uid: "uid"
