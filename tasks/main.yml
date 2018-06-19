@@ -17,10 +17,19 @@
     url: "https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/config_file.repo?os={{ ansible_distribution | lower }}&dist={{ ansible_distribution_major_version }}"
     dest: /etc/yum.repos.d/gitlab_gitlab-ce.repo
 
+- name: gitlab gpg keys present
+  rpm_key:
+    key: "{{ item }}"
+    state: present
+  with_items:
+    - https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey
+    - https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey/gitlab-gitlab-ce-3D645A26AB9FBD22.pub.gpg
+
 - name: install gitlab-ce
   yum:
     name: gitlab-ce
     state: present
+    update_cache: yes
   notify: reconfigure gitlab
 
 - name: create gitlab tls directories
