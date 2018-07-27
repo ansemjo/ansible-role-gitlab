@@ -44,7 +44,7 @@ gitlab_rails['backup_upload_remote_directory'] = '{{ gitlab_backup_s3_bucket }}'
 
 # ldap authentication
 gitlab_rails['ldap_enabled'] = {{ gitlab_ldap_enabled | bool | ternary('true', 'false') }}
-{% if gitlab_ldap_enabled == "true" %}
+{% if gitlab_ldap_enabled %}
 gitlab_rails['ldap_servers'] = YAML.load <<-'INLINE'
   main:
     label: {{ gitlab_ldap_label }}
