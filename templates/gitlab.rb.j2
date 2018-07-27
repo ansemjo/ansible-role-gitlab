@@ -1,12 +1,13 @@
+# {{ ansible_managed }}
 # https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/files/gitlab-config-template/gitlab.rb.template
 
 # integrated nginx and ssl settings
 external_url "{{ gitlab_external_url }}"
-nginx['redirect_http_to_https'] = {{ gitlab_redirect_to_https }}
+nginx['redirect_http_to_https'] = {{ gitlab_redirect_to_https | bool | ternary('true', 'false') }}
 nginx['ssl_certificate'] = "{{ gitlab_tls_cert }}"
 nginx['ssl_certificate_key'] = "{{ gitlab_tls_key }}"
 
-{% if gitlab_registry_enabled == "true" %}
+{% if gitlab_registry_enabled %}
 # integrated docker registry settings
 registry_external_url "{{ gitlab_registry_external_url }}"
 registry_nginx['ssl_certificate'] = "{{ gitlab_registry_tls_cert }}"
@@ -17,15 +18,32 @@ registry_nginx['ssl_certificate_key'] = "{{ gitlab_registry_tls_key }}"
 gitlab_rails['gitlab_default_theme'] = {{ gitlab_default_theme }}
 
 # default project feature settings
-gitlab_rails['gitlab_default_projects_features_issues'] = {{ gitlab_default_projects_features_issues }}
-gitlab_rails['gitlab_default_projects_features_merge_requests'] = {{ gitlab_default_projects_features_merge_requests }}
-gitlab_rails['gitlab_default_projects_features_wiki'] = {{ gitlab_default_projects_features_wiki }}
-gitlab_rails['gitlab_default_projects_features_snippets'] = {{ gitlab_default_projects_features_snippets }}
-gitlab_rails['gitlab_default_projects_features_builds'] = {{ gitlab_default_projects_features_builds }}
-gitlab_rails['gitlab_default_projects_features_container_registry'] = {{ gitlab_default_projects_features_container_registry }}
+gitlab_rails['gitlab_default_projects_features_issues'] = {{ gitlab_default_projects_features_issues | bool | ternary('true', 'false') }}
+gitlab_rails['gitlab_default_projects_features_merge_requests'] = {{ gitlab_default_projects_features_merge_requests | bool | ternary('true', 'false') }}
+gitlab_rails['gitlab_default_projects_features_wiki'] = {{ gitlab_default_projects_features_wiki | bool | ternary('true', 'false') }}
+gitlab_rails['gitlab_default_projects_features_snippets'] = {{ gitlab_default_projects_features_snippets | bool | ternary('true', 'false') }}
+gitlab_rails['gitlab_default_projects_features_builds'] = {{ gitlab_default_projects_features_builds | bool | ternary('true', 'false') }}
+gitlab_rails['gitlab_default_projects_features_container_registry'] = {{ gitlab_default_projects_features_container_registry | bool | ternary('true', 'false') }}
+
+{% if gitlab_backup_s3_enabled -%}
+# backups on s3
+gitlab_rails['backup_upload_connection'] = {
+  'provider' => 'AWS',
+  {% if gitlab_backup_s3_region is not none -%}
+  'region' => '{{ gitlab_backup_s3_region }}',
+  {% endif -%}
+  'aws_access_key_id' => '{{ gitlab_backup_s3_key_id }}',
+  'aws_secret_access_key' => '{{ gitlab_backup_s3_key_secret }}',
+  {% if gitlab_backup_s3_endpoint is not none -%}
+  'endpoint' => '{{ gitlab_backup_s3_endpoint }}',
+  {% endif -%}
+  'path_style' => {{ gitlab_backup_s3_path_style | bool | ternary('true', 'false') }}
+}
+gitlab_rails['backup_upload_remote_directory'] = '{{ gitlab_backup_s3_bucket }}'
+{% endif %}
 
 # ldap authentication
-gitlab_rails['ldap_enabled'] = {{ gitlab_ldap_enabled }}
+gitlab_rails['ldap_enabled'] = {{ gitlab_ldap_enabled | bool | ternary('true', 'false') }}
 {% if gitlab_ldap_enabled == "true" %}
 gitlab_rails['ldap_servers'] = YAML.load <<-'INLINE'
   main:
@@ -34,16 +52,16 @@ gitlab_rails['ldap_servers'] = YAML.load <<-'INLINE'
     host: {{ gitlab_ldap_host }}
     port: {{ gitlab_ldap_port }}
     encryption: {{ gitlab_ldap_encryption }}
-    verify_certificates: {{ gitlab_ldap_verify_certificates }}
+    verify_certificates: {{ gitlab_ldap_verify_certificates | bool | ternary('yes', 'no') }}
     ca_file: {{ gitlab_ldap_ca_file }}
 
     uid: {{ gitlab_ldap_uid }}
     bind_dn: {{ gitlab_ldap_bind_dn }}
     password: {{ gitlab_ldap_password }}
 
-    active_directory: {{ gitlab_ldap_active_directory }}
-    allow_username_or_email_login: {{ gitlab_ldap_allow_username_or_email }}
-    block_auto_created_users: {{ gitlab_ldap_block_autocreated_users }}
+    active_directory: {{ gitlab_ldap_active_directory | bool | ternary('yes', 'no') }}
+    allow_username_or_email_login: {{ gitlab_ldap_allow_username_or_email | bool | ternary('yes', 'no') }}
+    block_auto_created_users: {{ gitlab_ldap_block_autocreated_users | bool | ternary('yes', 'no') }}
     base: {{ gitlab_ldap_base }}
     user_filter: {{ gitlab_ldap_user_filter }}
     attributes:
