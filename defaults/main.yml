@@ -4,7 +4,8 @@
 ansemjo_gitlab_template: "gitlab.rb.j2"
 ansemjo_gitlab_additional_ports: []
 ansemjo_gitlab_ca_symlinks:
-    - { src: "/etc/ipa/ca.crt", dst: "/etc/gitlab/trusted-certs/ipa-ca.crt" }
+    - src: /etc/ipa/ca.crt
+      dst: /etc/gitlab/trusted-certs/ipa-ca.crt
 
 # gitlab nginx
 gitlab_fqdn: "{{ ansible_fqdn }}"
@@ -14,8 +15,8 @@ gitlab_tls_key: "/etc/pki/tls/private/{{ gitlab_fqdn }}.key"
 gitlab_redirect_to_https: yes
 
 # gitlab container registry
+gitlab_registry_enabled: no
 gitlab_registry_fqdn: "registry.{{ gitlab_fqdn }}"
-gitlab_registry_enabled: "false"
 gitlab_registry_external_url: "https://{{ gitlab_registry_fqdn }}/"
 gitlab_registry_tls_cert: "/etc/pki/tls/certs/{{ gitlab_registry_fqdn }}.crt"
 gitlab_registry_tls_key: "/etc/pki/tls/private/{{ gitlab_registry_fqdn }}.key"
@@ -30,6 +31,10 @@ gitlab_default_projects_features_wiki: no
 gitlab_default_projects_features_snippets: no
 gitlab_default_projects_features_builds: no
 gitlab_default_projects_features_container_registry: no
+
+# backup scheduling
+gitlab_backup_on_calendar: weekly # systemd OnCalendar= format
+gitlab_backup_keep_time: null # null: whatever gitlab default is, otherwise time in seconds
 
 # backups on s3
 gitlab_backup_s3_enabled: no

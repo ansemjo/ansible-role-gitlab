@@ -25,6 +25,11 @@ gitlab_rails['gitlab_default_projects_features_snippets'] = {{ gitlab_default_pr
 gitlab_rails['gitlab_default_projects_features_builds'] = {{ gitlab_default_projects_features_builds | bool | ternary('true', 'false') }}
 gitlab_rails['gitlab_default_projects_features_container_registry'] = {{ gitlab_default_projects_features_container_registry | bool | ternary('true', 'false') }}
 
+{% if gitlab_backup_keep_time is not none -%}
+# keep backups for specified time
+gitlab_rails['backup_keep_time'] = {{ gitlab_backup_keep_time }}
+{% endif -%}
+
 {% if gitlab_backup_s3_enabled -%}
 # backups on s3
 gitlab_rails['backup_upload_connection'] = {

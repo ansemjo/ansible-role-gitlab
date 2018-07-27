@@ -4,6 +4,17 @@
 
 - include: tls.yml
 
+- name: install gitlab-backup service files
+  template:
+    src: "{{ item }}"
+    dest: /etc/systemd/system/
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - gitlab-backup.service
+    - gitlab-backup.timer
+
 - name: template configuration file
   template:
     src: "{{ ansemjo_gitlab_template }}"
@@ -12,5 +23,12 @@
     group: root
     mode: 0600
   notify: reconfigure gitlab
+
+- name: enable backup schedule
+  systemd:
+    name: gitlab-backup.timer
+    state: started
+    enabled: yes
+    daemon_reload: yes
 
 - include: firewall.yml

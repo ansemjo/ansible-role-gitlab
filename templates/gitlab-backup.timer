@@ -1,0 +1,9 @@
+[Unit]
+Description=Scheduled GitLab Backup
+
+[Timer]
+OnCalendar={{ gitlab_backup_on_calendar }}
+Persistent=true
+
+[Install]
+WantedBy=multi-user.target

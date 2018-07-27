@@ -1,0 +1,14 @@
+[Unit]
+Description=Create GitLab Backup
+After=network.target
+
+[Service]
+Type=oneshot
+User=git
+SyslogIdentifier=gitlab-backup
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=full
+ProtectHome=true
+NoNewPrivileges=true
+ExecStart=/usr/bin/gitlab-rake gitlab:backup:create
