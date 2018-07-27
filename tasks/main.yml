@@ -1,65 +1,8 @@
 ---
 
-- name: install gitlab dependencies
-  yum:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - curl
-    - openssh-server
-    - openssl
-    - policycoreutils-python
-    - postfix
-    - tzdata
+- include: install.yml
 
-- name: download repository config
-  get_url:
-    url: "https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/config_file.repo?os={{ ansible_distribution | lower }}&dist={{ ansible_distribution_major_version }}"
-    dest: /etc/yum.repos.d/gitlab_gitlab-ce.repo
-  register: repo
-
-- name: gitlab gpg keys present
-  rpm_key:
-    key: "{{ item }}"
-    state: present
-  with_items:
-    - https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey
-    - https://packages.gitlab.com/gitlab/gitlab-ce/gpgkey/gitlab-gitlab-ce-3D645A26AB9FBD22.pub.gpg
-  when: repo is changed
-  register: keys
-
-- name: yum makecache
-  command: yum makecache -y --disablerepo=* --enablerepo=gitlab*
-  args:
-    warn: no
-  when: (repo is changed) or (keys is changed)
-
-- name: install gitlab-ce
-  yum:
-    name: gitlab-ce
-    state: present
-    update_cache: yes
-  notify: reconfigure gitlab
-
-- name: create gitlab tls directories
-  file:
-    state: directory
-    mode: "{{ item.mode | default(omit) }}"
-    owner: root
-    path: "{{ item.path }}"
-  with_items:
-    - path: /etc/gitlab/trusted-certs
-    - path: /etc/gitlab/ssl
-      mode: go-rwx
-
-- name: create ca symlinks
-  file:
-    state: link
-    src: "{{ item.src }}"
-    path: "{{ item.dst }}"
-    force: yes
-  with_items: "{{ ansemjo_gitlab_ca_symlinks }}"
-  notify: reconfigure gitlab
+- include: tls.yml
 
 - name: template configuration file
   template:
@@ -70,21 +13,4 @@
     mode: 0600
   notify: reconfigure gitlab
 
-- name: open firewall services
-  firewalld:
-    service: "{{ item }}"
-    permanent: yes
-    immediate: yes
-    state: enabled
-  with_items:
-    - http
-    - https
-    - ssh
-
-- name: open additional firewall ports
-  firewalld:
-    port: "{{ item }}"
-    permanent: yes
-    immediate: yes
-    state: enabled
-  with_items: "{{ ansemjo_gitlab_additional_ports }}"
+- include: firewall.yml

@@ -1,0 +1,21 @@
+---
+
+- name: create gitlab tls directories
+  file:
+    state: directory
+    mode: "{{ item.mode | default(omit) }}"
+    owner: root
+    path: "{{ item.path }}"
+  with_items:
+    - path: /etc/gitlab/trusted-certs
+    - path: /etc/gitlab/ssl
+      mode: go-rwx
+
+- name: create ca symlinks
+  file:
+    state: link
+    src: "{{ item.src }}"
+    path: "{{ item.dst }}"
+    force: yes
+  with_items: "{{ ansemjo_gitlab_ca_symlinks }}"
+  notify: reconfigure gitlab

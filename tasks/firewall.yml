@@ -1,0 +1,20 @@
+---
+
+- name: open firewall services
+  firewalld:
+    service: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  with_items:
+    - http
+    - https
+    - ssh
+
+- name: open additional firewall ports
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  with_items: "{{ ansemjo_gitlab_additional_ports }}"
