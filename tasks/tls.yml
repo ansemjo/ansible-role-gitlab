@@ -17,5 +17,5 @@
     src: "{{ item.src }}"
     path: "{{ item.dst }}"
     force: yes
-  with_items: "{{ ansemjo_gitlab_ca_symlinks }}"
+  with_items: "{{ gitlab_ca_symlinks }}"
   notify: reconfigure gitlab

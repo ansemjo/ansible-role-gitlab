@@ -1,9 +1,9 @@
 ---
 
 # role variables
-ansemjo_gitlab_template: "gitlab.rb.j2"
-ansemjo_gitlab_additional_ports: []
-ansemjo_gitlab_ca_symlinks:
+gitlab_template: "gitlab.rb.j2"
+gitlab_additional_firewall_ports: []
+gitlab_ca_symlinks:
     - src: /etc/ipa/ca.crt
       dst: /etc/gitlab/trusted-certs/ipa-ca.crt
 

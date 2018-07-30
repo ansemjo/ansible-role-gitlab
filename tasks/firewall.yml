@@ -17,4 +17,4 @@
     permanent: yes
     immediate: yes
     state: enabled
-  with_items: "{{ ansemjo_gitlab_additional_ports }}"
+  with_items: "{{ gitlab_additional_firewall_ports }}"

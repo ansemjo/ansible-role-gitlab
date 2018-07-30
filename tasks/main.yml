@@ -17,7 +17,7 @@
 
 - name: template configuration file
   template:
-    src: "{{ ansemjo_gitlab_template }}"
+    src: "{{ gitlab_template }}"
     dest: /etc/gitlab/gitlab.rb
     owner: root
     group: root
