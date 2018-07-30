@@ -1,0 +1,7 @@
+galaxy_info:
+  author: Anton Semjonov
+  description: Install and configure GitLab Community Edition
+  license: MIT
+  galaxy_tags: []
+  role_name: gitlab
+dependencies: []
